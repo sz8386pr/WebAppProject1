@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Game Menu</title>
     <link rel="stylesheet" href="gameCSS.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+
     <script src="gameJS.js"></script>
 
 </head>
@@ -13,10 +16,20 @@
     </div>
 
     <div class="stats">
-        <p class="text-center">PLAYER STATS</p>
-        <p>HP: <span id="hp"></span></p>
-        <p>ATT: <span id="att"></span></p>
-        <p>DEF: <span id="def"></span></p>
+        <table>
+            <tr>
+                <th>PLAYER STATS</th>
+            </tr>
+            <tr>
+                <td>HP: <span id="hp"></td>
+            </tr>
+            <tr>
+                <td>ATT: <span id="att"></span></td>
+            </tr>
+            <tr>
+                <td>DEF: <span id="def"></span></td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
