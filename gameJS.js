@@ -1,25 +1,78 @@
-$(document).ready(function() {
-    resize();
-    var current_progress = 100;
-    var health = 100;
+// iframe contents
+var mainFrameContents;
+var menuFrameContents;
 
-    var interval = setInterval(function () {
-        current_progress -= 10;
-        var currentHealth = health - current_progress
-        console.log(currentHealth)
-        if (current_progress <= 0)
-            clearInterval(interval);
-        $('#test')
-            .css("width", currentHealth + '%')
-            .attr("aria-valuenow", currentHealth)
-        $('#enemyHP')
-            .text(currentHealth);
-     }, 1000);
+// Base player stats
+var playerHP = 100;
+var playerAtt = 10;
+var playerDef = 10;
+var xp = 0;
+var currentGold = 0;
+
+var stage = 1;
+
+//https://stackoverflow.com/questions/8093297/jquery-can-i-detect-once-all-content-is-loaded
+$(window).on('load', function() {
+
+    // default number setup
+    setup();
+
+    menuFrameContents.find("#attackButton").click(function(){attackEnemy()});
+
+    // var testval = mainFrameContents.find("#stageNumber").text();
+    // console.log(testval);
+    // console.log(menuFrameContents.find('#gold').text());
+
+
+
+
+    //HP bar test
+    // var current_progress = 100;
+    // var health = 100;
+    //
+    // var interval = setInterval(function () {
+    //     current_progress -= 10;
+    //     var currentHealth = health - current_progress
+    //     console.log(currentHealth)
+    //     if (current_progress <= 0)
+    //         clearInterval(interval);
+    //     mainFrameContents.find('#test')
+    //         .css("width", currentHealth + '%')
+    //         .attr("aria-valuenow", currentHealth);
+    //     mainFrameContents.find('#enemyHP')
+    //         .text(currentHealth);
+    //  }, 1000);
+
+
+
+
+
 });
 
+
+function setup() {
+    resize();
+    // iframe contents
+    mainFrameContents = $('iframe#mainFrame').contents();
+    menuFrameContents = $('iframe#menuFrame').contents();
+
+    // player stats
+    menuFrameContents.find('#hp').text(playerHP);
+    menuFrameContents.find('#att').text(playerAtt);
+    menuFrameContents.find('#def').text(playerDef);
+    menuFrameContents.find('#xp').text(xp);
+    menuFrameContents.find('#gold').text(currentGold);
+
+    // st
+    mainFrameContents.find('#stageNumber').text(stage);
+}
+
+
+
+
+
 // adjust the game size keeping the aspect ratio
-function resize()
-{
+function resize() {
     var windowWidth = window.innerWidth;
     var windowHeight = window.innerHeight;
 
@@ -37,6 +90,14 @@ function resize()
     $("#menuFrame")
         .css('height', height + "px")
         .css('width', width *.25 + 'px');
+}
+
+
+function attackEnemy() {
+
+    var ee = menuFrameContents.find('#hp').text();
+    console.log(ee);
+
 }
 
 window.addEventListener("resize", resize);
