@@ -1,10 +1,30 @@
 body{margin:0; font-family: Verdana, Geneva, sans-serif; overflow: hidden}
 iframe{margin:0;width:100%; border-left:1px solid black; border-right:1px solid black;}
 p{margin:0}
-table{align-self: center}
+table{align-self: center; height: 26vh}
 td{
-    font-size: 2.5vh;
+    font-size: 2vh;
+    font-weight: normal;
 }
+.statTitle {
+    font-size: 2.3vh;
+    text-align: center;
+    font-weight: bolder;
+    padding-bottom: 1vh;
+}
+
+.statHeader {
+    text-align: justify;
+    width: 35%;
+    font-weight: bold;
+}
+.statNumber {
+    width: 65%;
+}
+
+
+
+
 
 .gameBody {
     background-color: #272926;
@@ -16,7 +36,6 @@ td{
     font-size: 0;
     max-height: 900px;
     max-width: 810px;
-    /*height: 100%;*/
 }
 
 .text-center {
@@ -72,7 +91,7 @@ td{
 
 .stats {
     border-bottom: 2px solid black;
-    height: 25vh;
+    height: 30vh;
     width: 100%;
     font-weight: bold;
     font-size: 2vh;
@@ -80,7 +99,6 @@ td{
     display: flex;
     justify-content: center;
 }
-
 
 
 
@@ -100,25 +118,48 @@ td{
 
 
 .enemyHPBar {
-
     height: 5vh;
+    vertical-align: center;
 
 }
 
 
 .progress {
-    height: 5vh;
+    height: 4.5vh;
     width: 100%
 
 }
 
 #enemyHP {
-    font-size: 3vh;
+    font-size: 2vh;
     text-align: center;
+    color: darkgreen;
+    vertical-align: top;
 }
 
 #enemyBar {
     padding: .5vh 0;
+    vertical-align: center;
 }
 
 
+.monster {
+    text-align: center;
+}
+
+#monsterNameDisplay {
+    font-weight: bolder;
+    font-size: 10vw;
+    color: crimson;
+}
+
+#monsterImage {
+    height: auto;
+    width: 90vw;
+}
+
+.robohash {
+    text-align: right;
+    vertical-align: bottom;
+    font-size: 2vh;
+}
