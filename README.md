@@ -2,9 +2,9 @@
 Endless Dungeon  
 Created by Scott Kim  
 
-images/sounds: game images and sounds folder
+images/sounds: game images and sounds folder  
   -dungeon.html: dungeon window: Background is inside the dungeon; stage number, enemy health bar, enemy portrait... etc.  
-                                 enemy portrait is brought by using the Robohash.org hash algorithm.
+                                 enemy portrait is brought by using the Robohash.org hash algorithm.  
   -gameCSS.css: game style sheet. Should/could have created multiple sheets for different windows.  
   -gameJS.js: game js file. The same as the stylesheet.  
   -main.html: the main html file that displays the 2 iwindows of menu and dungeon, as well as shop and help window.  
@@ -17,7 +17,7 @@ that I could/need to research and learn more. If I stick with something that I a
 
 Another thing that took me a long time as well was dynamically adjustable layout.  
 I feel like that I've spent way too much time on the basic layout than the actual game program/algorithm,  
-yet it's still not 100% of what I have envisioned.
+yet it's still not 100% of what I have envisioned.  
 
 One thing that I've learnt is that people are attracted and appreciative a lot more on the visuals and the sounds.  
 When there were no monster portraits and no sound effects,(maybe no icons either) my girlfriend was jokingly telling me  
