@@ -1,6 +1,6 @@
-# WebAppProject1
-Endless Dungeon
-Created by Scott Kim
+# WebAppProject1  
+Endless Dungeon  
+Created by Scott Kim  
 
 images/sounds: game images and sounds folder
   -dungeon.html: dungeon window: Background is inside the dungeon; stage number, enemy health bar, enemy portrait... etc.  
