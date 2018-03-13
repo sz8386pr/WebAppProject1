@@ -1,10 +1,11 @@
 body{margin:0; font-family: Verdana, Geneva, sans-serif; overflow: hidden}
 iframe{margin:0;width:100%; border-left:1px solid black; border-right:1px solid black;}
 p{margin:0}
-table{align-self: center; height: 26vh}
+table{align-self: center; height: 26vh;}
 td{
     font-size: 2vh;
     font-weight: normal;
+    /*border: 1px solid;*/
 }
 .statTitle {
     font-size: 2.3vh;
@@ -19,8 +20,18 @@ td{
     font-weight: bold;
 }
 .statNumber {
-    width: 65%;
+    width: 45%;
 }
+
+.statPlus {
+    background: url( 'images/plus.jpg' ) no-repeat center;
+    background-size: contain;
+    height: 3vh;
+    width: auto;
+    display: block;
+}
+
+
 
 
 
@@ -145,6 +156,7 @@ td{
 
 .monster {
     text-align: center;
+
 }
 
 #monsterNameDisplay {
@@ -153,12 +165,22 @@ td{
     color: crimson;
 }
 
+#monsterNameSuffix {
+    font-size: 4vw;
+    color: forestgreen;
+}
+
 #monsterImage {
     height: auto;
     width: 90vw;
 }
 
 .robohash {
+
+    position: absolute;
+    bottom: 0;
+    right: 1vw;
+
     text-align: right;
     vertical-align: bottom;
     font-size: 2vh;

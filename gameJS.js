@@ -6,22 +6,59 @@ var menuFrameContents;
 var stage = 1;
 
 let gameOver = false;
+let pause = false;
+
 //https://stackoverflow.com/questions/8093297/jquery-can-i-detect-once-all-content-is-loaded
 $(window).on('load', function() {
 
     // default number setup
     let playerData = setup();
 
+    statsSetup(playerData);
+
     beginStage(playerData);
 
-    menuFrameContents.find("#attackButton").click(function(){
-        if (gameOver) {
-            alert("Game is over. Refresh the page to play again")
+    // checks if player hp falls below 0
+    let playerLife = setInterval(function () {
+        if ( (playerData.playerHP <= 0) && !gameOver) {
+            clearInterval(playerLife);
+            endGame();
         }
-    });
+    }, 0);
+
+
 
 
 });
+
+
+// for stats plus menu
+function statsSetup(playerData) {
+    let interval = setInterval(function() {
+        if (playerData.sp > 0) {
+            addStatPlus()
+        }
+        else if (playerData.sp <= 0) {
+            removeStatPlus();
+        }
+
+        if (gameOver) {
+            clearInterval(interval);
+        }
+    }, 0);
+
+
+    menuFrameContents.find("#hpPlus").click(function(){
+        addHP(playerData);
+    });
+    menuFrameContents.find("#attPlus").click(function(){
+        addAtt(playerData);
+    });
+    menuFrameContents.find("#defPlus").click(function(){
+        addDef(playerData);
+    });
+}
+
 
 // initial stats/number display
 function setup() {
@@ -29,7 +66,7 @@ function setup() {
     let playerHP = 100;
     let playerAtt = 5;
     let playerDef = 5;
-    let xp = 0;
+    let sp = 0;
     let currentGold = 0;
     resize();
     // iframe contents
@@ -40,24 +77,26 @@ function setup() {
     menuFrameContents.find('#hp').text(playerHP);
     menuFrameContents.find('#att').text(playerAtt);
     menuFrameContents.find('#def').text(playerDef);
-    menuFrameContents.find('#xp').text(xp);
+    menuFrameContents.find('#sp').text(sp);
     menuFrameContents.find('#gold').text(currentGold);
 
-    return {playerHP: playerHP, playerAtt: playerAtt, playerDef: playerDef, xp: xp, currentGold: currentGold};
+    return {playerHP: playerHP, playerAtt: playerAtt, playerDef: playerDef, sp: sp, currentGold: currentGold};
 }
 
 
 
 // enemy stats referenced from http://yanfly.moe/tools/enemylevelcalculator/
 function enemySetup() {
-    let baseEnemyHP = 50, baseEnemyAtt = 5, baseEnemyDef = 5, baseEnemyXP = 10, baseEnemyGold = 10;
-    let rateHP =  .3, rateAtt = .05, rateDef = .05, rateXP = .15, rateGold = 1;
-    let flatHP = 50, flatAtt = 2.5, flatDef = 2.5, flatXP = 10, flatGold = 10;
+    let suffixList = ['Beautiful', 'Pretty', 'Charming', 'Handsome', 'Sexy', 'Alluring', 'Gorgeous', 'Graceful', 'Divine', 'Elegant'];
+    let suffix = 'The ' + suffixList[Math.floor(Math.random() * suffixList.length)];
+
+    let baseEnemyHP = 50, baseEnemyAtt = 5, baseEnemyDef = 5, baseEnemyGold = 10;
+    let rateHP =  .3, rateAtt = .05, rateDef = .05, rateGold = 1;
+    let flatHP = 50, flatAtt = 2.5, flatDef = 2.5, flatGold = 10;
 
     let enemyHP = enemyCalc(baseEnemyHP, rateHP, flatHP);
     let enemyAtt = enemyCalc(baseEnemyAtt, rateAtt, flatAtt);
     let enemyDef = enemyCalc(baseEnemyDef, rateDef, flatDef);
-    // let enemyXP = Math.round(enemyCalc(baseEnemyXP, rateXP, flatXP));
     let enemyGold = Math.round(enemyCalc(baseEnemyGold, rateGold, flatGold));
 
     // console.log(enemyDef + 'eDef');
@@ -76,15 +115,16 @@ function enemySetup() {
             .css("width", '100' + '%');
     mainFrameContents.find('#enemyHP').text('100');
 
-
+    // change enemy image based on randomly generated name. Powered by robohash.org
+    // robohash.org generates random images based on the text sting.
     mainFrameContents.find('#monsterNameDisplay').text(enemyName);
+    mainFrameContents.find('#monsterNameSuffix').text(suffix);
     mainFrameContents.find('#monsterImage')
-        .attr("src", "https://robohash.org/" + enemyName +"?set=set2")
-        .attr("alt", "Lovely portrait of " + enemyName);
+        .attr("src", "https://robohash.org/" + enemyName + "?set=set2")
+        .attr("alt", "Lovely portrait of " + enemyName)
+        .fadeIn('slow');
 
-    return {enemyHP: enemyHP, enemyAtt: enemyAtt, enemyDef: enemyDef,
-        // enemyXP: enemyXP,
-        enemyGold: enemyGold, enemyName: enemyName};
+    return {enemyHP: enemyHP, enemyAtt: enemyAtt, enemyDef: enemyDef, enemyGold: enemyGold, enemyName: enemyName};
 }
 
 // enemy stats calculation referenced from http://yanfly.moe/tools/enemylevelcalculator/
@@ -98,19 +138,12 @@ function beginStage(playerData) {
     let enemyAttackRate = 5000; //default enemy attackrate of 5000 ms
     let enemyData = enemySetup();
 
-    // change enemy image based on randomly generated name. Powered by robohash.org
-    // robohash.org generates random images based on the text sting.
-
-
     let enemyCurrentHP = enemyData.enemyHP;
 
     enemyData.enemyCurrentHP = enemyCurrentHP;
-    // let xp = enemyData.enemyXP;
     let gold = enemyData.enemyGold;
 
-    // console.log(enemyCurrentHP);
-
-
+    // enemy attacks player
     let enemyAttack = setInterval(function(){
         if ( enemyData.enemyCurrentHP <= 0 || playerData.playerHP <= 0) {
             clearInterval(enemyAttack);
@@ -118,10 +151,9 @@ function beginStage(playerData) {
         else {
             enemyAtt(playerData, enemyData);
         }
-
     }, enemyAttackRate);
 
-
+    // checks if player have defeated the enemy
     let interval = setInterval(function() {
         if (enemyData.enemyCurrentHP <= 0) {
             clearInterval(interval);
@@ -129,29 +161,29 @@ function beginStage(playerData) {
         }
     }, 0);
 
-    let playerLife = setInterval(function () {
-        if ( (playerData.playerHP <= 0) && !gameOver) {
-            clearInterval(playerLife);
-            endGame();
-        }
-
-    }, 0);
-
-    menuFrameContents.find("#attackButton").click(function(){
+    // attack button onclick
+    // unbind() reference from https://stackoverflow.com/questions/14969960/jquery-click-events-firing-multiple-times
+    menuFrameContents.find("#attackButton").unbind().click(function(){
         if (!gameOver) {
             attackEnemy(playerData, enemyData)
+        }
+        else if (gameOver) {
+            alert("Game is over. Refresh the page to play again")
         }
     });
 
 }
 
 
-
 // when the player defeats the enemy of the stage
 function endStage(playerData, gold) {
+    let spGain = 5; // stat point gain
+
     alert('Stage' + stage + ' clear!\nOnto the next stage!');
+    playerData.sp += spGain;
     playerData.currentGold += gold;
 
+    menuFrameContents.find('#sp').text(playerData.sp);
     menuFrameContents.find('#gold').text(gold);
 
     stage++;
@@ -161,30 +193,6 @@ function endStage(playerData, gold) {
 
 
 
-
-
-
-
-// adjust the game size keeping the aspect ratio
-function resize() {
-    let windowWidth = window.innerWidth;
-    let windowHeight = window.innerHeight;
-
-    let  height = windowHeight-10;
-    let  width = height *0.9;
-
-    if (width >= windowWidth-10) {
-         width = windowWidth-10;
-         height = width / 0.9;
-    }
-
-    $("#mainFrame")
-        .css('height', height + "px")
-        .css('width', width*.75 + 'px');
-    $("#menuFrame")
-        .css('height', height + "px")
-        .css('width', width *.25 + 'px');
-}
 
 
 // combat damage calculation. Returns the dmg value based on the attacker
@@ -202,6 +210,10 @@ function combat(playerData, enemyData, attacker) {
 
 // enemy attack phase
 function enemyAtt(playerData, enemyData) {
+    // sound by Hybrid_V https://freesound.org/people/Hybrid_V/sounds/319590/
+    let audio = new Audio('sounds/bash.wav');
+    audio.play();
+
     let playerDMG = combat(playerData, enemyData, 'enemy');
 
     playerData.playerHP -= playerDMG;
@@ -220,6 +232,11 @@ function enemyAtt(playerData, enemyData) {
 
 // player attack on click
 function attackEnemy(playerData, enemyData) {
+    // sound by LiamG_SFX https://freesound.org/people/LiamG_SFX/sounds/322150/
+    let audio = new Audio('sounds/slash.wav');
+//     // sound by XxChr0nosxX https://freesound.org/people/XxChr0nosxX/sounds/268227/
+//     let audio = new Audio('sounds/swing.mp3');
+    audio.play();
     let enemyDMG = combat(playerData, enemyData, 'player');
 
     enemyData.enemyCurrentHP -= enemyDMG;
@@ -241,11 +258,82 @@ function attackEnemy(playerData, enemyData) {
     }
 }
 
+
+
+function addStatPlus() {
+    menuFrameContents.find(".statPlus").css("display", "block")
+}
+
+function removeStatPlus() {
+    menuFrameContents.find(".statPlus").css("display", "none")
+}
+
+
+function addHP(playerData){
+    // sound by goldendiaphragm https://freesound.org/people/goldendiaphragm/sounds/321288/
+    let audio = new Audio('sounds/plus.wav');
+    audio.play();
+
+    playerData.playerHP += 5;
+    playerData.sp --;
+
+    menuFrameContents.find('#hp').text(playerData.playerHP.toFixed(0));
+    menuFrameContents.find('#sp').text(playerData.sp);
+}
+
+function addAtt(playerData){
+    // sound by goldendiaphragm https://freesound.org/people/goldendiaphragm/sounds/321288/
+    let audio = new Audio('sounds/plus.wav');
+    audio.play();
+    playerData.playerAtt ++;
+    playerData.sp --;
+
+    menuFrameContents.find('#att').text(playerData.playerAtt);
+    menuFrameContents.find('#sp').text(playerData.sp);
+    }
+
+function addDef(playerData){
+    // sound by goldendiaphragm https://freesound.org/people/goldendiaphragm/sounds/321288/
+    let audio = new Audio('sounds/plus.wav');
+    audio.play();
+    playerData.playerDef ++;
+    playerData.sp --;
+
+    menuFrameContents.find('#def').text(playerData.playerDef);
+    menuFrameContents.find('#sp').text(playerData.sp);
+}
+
+
 // when player hp goes equal to or below 0
 function endGame() {
+    // sound by TheSubber13 https://freesound.org/people/TheSubber13/sounds/239900/
+    let audio = new Audio('sounds/scream.ogg');
+    audio.play();
     alert('You died');
     gameOver = true;
 
+}
+
+
+// adjust the game size keeping the aspect ratio
+function resize() {
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+
+    let  height = windowHeight-10;
+    let  width = height *0.9;
+
+    if (width >= windowWidth-10) {
+        width = windowWidth-10;
+        height = width / 0.9;
+    }
+
+    $("#mainFrame")
+        .css('height', height + "px")
+        .css('width', width*.75 + 'px');
+    $("#menuFrame")
+        .css('height', height + "px")
+        .css('width', width *.25 + 'px');
 }
 
 // whenever player resize one's window, trigger resize() function
