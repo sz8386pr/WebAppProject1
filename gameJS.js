@@ -14,7 +14,7 @@ function IntervalTimer(callback, interval) {
     let timerId, startTime, remaining = 0;
     let state = 0; //  0 = idle, 1 = running, 2 = paused, 3= resumed
 
-    this.pause = function () {
+    this.pause = function() {
         if (state !== 1) return;
 
         pause = true;
@@ -24,7 +24,7 @@ function IntervalTimer(callback, interval) {
 
     };
 
-    this.resume = function () {
+    this.resume = function() {
         if (state !== 2) return;
 
         pause = false;
@@ -33,7 +33,7 @@ function IntervalTimer(callback, interval) {
 
     };
 
-    this.timeoutCallback = function () {
+    this.timeoutCallback = function() {
         if (state !== 3) return;
 
         callback();
@@ -59,19 +59,114 @@ $(window).on('load', function() {
     let playerData = setup();
 
     statsSetup(playerData);
+    itemsSetup();
 
     beginStage(playerData);
 
     // checks if player hp falls below 0
-    let playerLife = setInterval(function () {
-        if ( (playerData.playerHP <= 0) && !gameOver) {
+    let playerLife = setInterval(function() {
+        if ((playerData.playerHP <= 0) && !gameOver) {
             clearInterval(playerLife);
             endGame();
         }
     }, 0);
 
+    // let shopValue = setInterval(function() {
+
+    // }, 0);
+
 
 });
+
+
+function calculateItemValue(playerData) {
+    let items = document.getElementsByClassName("item");
+    let checkedItems = [];
+    let totalPrice = 0;
+
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].checked === true) {
+            checkedItems.push(items[i].name);
+            totalPrice += items[i].value;
+        }
+    }
+
+    $("#purchaseTotal").text(totalPrice);
+}
+
+function itemsSetup() {
+    let itemList = [
+        {
+        'name': 'Cloth Armor',
+        'bonus': 10,
+        'type': 'armor',
+        'gold': 300
+        },
+        {
+            'name': 'Leather Armor',
+            'bonus': 30,
+            'type': 'armor',
+            'gold': 800
+        },
+        {
+            'name': 'Steel Armor',
+            'bonus': 60,
+            'type': 'armor',
+            'gold': 1500
+        },
+        {
+            'name': 'Dagger',
+            'bonus': 10,
+            'type': 'weapon',
+            'gold': 300
+        },
+        {
+            'name': 'Long Sword',
+            'bonus': 30,
+            'type': 'weapon',
+            'gold': 800
+        },
+        {
+            'name': 'Great Armor',
+            'bonus': 60,
+            'type': 'weapon',
+            'gold': 1500
+        },
+        {
+            'name': 'Health Potion',
+            'bonus': 50,
+            'type': 'potion',
+            'gold': 300
+        },
+        {
+            'name': 'Greater Potion',
+            'bonus': 150,
+            'type': 'potion',
+            'gold': 800
+        },
+        {
+            'name': 'Ultra Potion',
+            'bonus': 300,
+            'type': 'potion',
+            'gold': 1500
+        }
+    ];
+
+    for (let item in itemList) {
+        let bonus = 0;
+        if (itemList[item].type === 'armor') {
+            bonus = itemList[item].bonus + ' DEF'
+        } else if (itemList[item].type === 'weapon') {
+            bonus = itemList[item].bonus + ' ATT'
+        } else if (itemList[item].type === 'potion') {
+            bonus = itemList[item].bonus + ' HP'
+        }
+        $("#purchaseTable").append('<tr><td>' + itemList[item].name + '</td><td>' + bonus + '</td><td>' + itemList[item].gold + '</td><td><input type=checkbox class=\'+ itemList[item].type +\' id=\'+ itemList[item].name +\'></td></tr>');
+    }
+    $("#purchaseTable").append('<tr><td>Your Gold</td><td><span id="gold"></span></td><td>Total</td><td id="purchaseTotal"></td></tr><tr><td colspan="4" id="purchaseCell"><p id="purchaseButton">PURCHASE</p></td></tr>');
+}
+
+
 
 
 // for stats plus menu
@@ -79,8 +174,7 @@ function statsSetup(playerData) {
     let interval = setInterval(function() {
         if (playerData.sp > 0) {
             addStatPlus()
-        }
-        else if (playerData.sp <= 0) {
+        } else if (playerData.sp <= 0) {
             removeStatPlus();
         }
 
@@ -90,13 +184,13 @@ function statsSetup(playerData) {
     }, 0);
 
 
-    menuFrameContents.find("#hpPlus").click(function(){
+    menuFrameContents.find("#hpPlus").click(function() {
         addHP(playerData);
     });
-    menuFrameContents.find("#attPlus").click(function(){
+    menuFrameContents.find("#attPlus").click(function() {
         addAtt(playerData);
     });
-    menuFrameContents.find("#defPlus").click(function(){
+    menuFrameContents.find("#defPlus").click(function() {
         addDef(playerData);
     });
 }
@@ -122,7 +216,13 @@ function setup() {
     menuFrameContents.find('#sp').text(sp);
     menuFrameContents.find('#gold').text(currentGold);
 
-    return {playerHP: playerHP, playerAtt: playerAtt, playerDef: playerDef, sp: sp, currentGold: currentGold};
+    return {
+        playerHP: playerHP,
+        playerAtt: playerAtt,
+        playerDef: playerDef,
+        sp: sp,
+        currentGold: currentGold
+    };
 }
 
 
@@ -132,9 +232,18 @@ function enemySetup() {
     let suffixList = ['Beautiful', 'Pretty', 'Charming', 'Handsome', 'Sexy', 'Alluring', 'Gorgeous', 'Graceful', 'Divine', 'Elegant'];
     let suffix = 'The ' + suffixList[Math.floor(Math.random() * suffixList.length)];
 
-    let baseEnemyHP = 50, baseEnemyAtt = 5, baseEnemyDef = 5, baseEnemyGold = 10;
-    let rateHP =  .3, rateAtt = .05, rateDef = .05, rateGold = 1;
-    let flatHP = 50, flatAtt = 2.5, flatDef = 2.5, flatGold = 10;
+    let baseEnemyHP = 50,
+        baseEnemyAtt = 5,
+        baseEnemyDef = 5,
+        baseEnemyGold = 10;
+    let rateHP = .5,
+        rateAtt = .2,
+        rateDef = .2,
+        rateGold = .25;
+    let flatHP = 50,
+        flatAtt = 2.5,
+        flatDef = 2.5,
+        flatGold = 5;
 
     let enemyHP = enemyCalc(baseEnemyHP, rateHP, flatHP);
     let enemyAtt = enemyCalc(baseEnemyAtt, rateAtt, flatAtt);
@@ -152,9 +261,9 @@ function enemySetup() {
     // update stage number
     mainFrameContents.find('#stageNumber').text(stage);
     mainFrameContents.find('#enemyHPBar')
-            .attr("aria-valuemax", enemyHP)
-            .attr("aria-valuenow", enemyHP)
-            .css("width", '100' + '%');
+        .attr("aria-valuemax", enemyHP)
+        .attr("aria-valuenow", enemyHP)
+        .css("width", '100' + '%');
     mainFrameContents.find('#enemyHP').text('100');
 
     // change enemy image based on randomly generated name. Powered by robohash.org
@@ -166,7 +275,13 @@ function enemySetup() {
         .attr("alt", "Lovely portrait of " + enemyName)
         .fadeIn('slow');
 
-    return {enemyHP: enemyHP, enemyAtt: enemyAtt, enemyDef: enemyDef, enemyGold: enemyGold, enemyName: enemyName};
+    return {
+        enemyHP: enemyHP,
+        enemyAtt: enemyAtt,
+        enemyDef: enemyDef,
+        enemyGold: enemyGold,
+        enemyName: enemyName
+    };
 }
 
 // enemy stats calculation referenced from http://yanfly.moe/tools/enemylevelcalculator/
@@ -186,17 +301,16 @@ function beginStage(playerData) {
     let gold = enemyData.enemyGold;
 
     // enemy attacks player
-    let enemyAttack = new IntervalTimer(function () {
+    let enemyAttack = new IntervalTimer(function() {
         if (enemyData.enemyCurrentHP <= 0 || playerData.playerHP <= 0) {
             clearInterval(enemyAttack);
-        }
-        else {
+        } else {
             enemyAtt(playerData, enemyData);
         }
     }, enemyAttackRate);
 
     // checks if player have defeated the enemy
-    let interval = setInterval(function () {
+    let interval = setInterval(function() {
         if (enemyData.enemyCurrentHP <= 0) {
             clearInterval(interval);
             endStage(playerData, gold);
@@ -205,26 +319,25 @@ function beginStage(playerData) {
 
     // attack button onclick
     // unbind() reference from https://stackoverflow.com/questions/14969960/jquery-click-events-firing-multiple-times
-    menuFrameContents.find("#attackButton").unbind().click(function () {
+    menuFrameContents.find("#attackButton").unbind().click(function() {
         if (!gameOver && !pause) {
             attackEnemy(playerData, enemyData)
-        }
-        else if (!gameOver && pause) {
+        } else if (!gameOver && pause) {
             alert('Game is paused.\nPress play to continue the game')
-        }
-        else if (gameOver) {
+        } else if (gameOver) {
             alert("Game is over.\nRefresh the page to play again")
         }
     });
 
     //pause button pauses enemy attack and player attack (gives player time to shop/upgrade stats)
-    menuFrameContents.find("#pause").unbind().click(function () {
+    menuFrameContents.find("#pause").unbind().click(function() {
         pauseOrPlay(enemyAttack)
     });
 
-    menuFrameContents.find("#shop").unbind().click(function () {
+    menuFrameContents.find("#shop").unbind().click(function() {
         pause = false;
         pauseOrPlay(enemyAttack);
+        $("#gold").text(playerData.currentGold);
         $("#popup").css("display", "block");
         $("#shopDiv").css("display", "block");
     });
@@ -237,12 +350,12 @@ function beginStage(playerData) {
     });
 
 
-    $("#purchaseButton").click(function(){
+    $("#purchaseButton").click(function() {
         purchase(playerData);
         pauseOrPlay(enemyAttack);
     });
 
-    $(".closeIcon").click(function(){
+    $(".closeIcon").click(function() {
         popupClose();
         pauseOrPlay(enemyAttack);
     })
@@ -255,8 +368,7 @@ function pauseOrPlay(enemyAttack) {
     if (!pause) {
         enemyAttack.pause();
         menuFrameContents.find('#pause').html("<img src=\"images/play.png\" class=\"icon\">PLAY");
-    }
-    else if (pause) {
+    } else if (pause) {
         enemyAttack.resume();
         menuFrameContents.find('#pause').html("<img src=\"images/pause.png\" class=\"icon\">PAUSE");
     }
@@ -271,13 +383,11 @@ function endStage(playerData, gold) {
     playerData.currentGold += gold;
 
     menuFrameContents.find('#sp').text(playerData.sp);
-    menuFrameContents.find('#gold').text(gold);
+    menuFrameContents.find('#gold').text(playerData.currentGold);
 
     stage++;
     beginStage(playerData)
 }
-
-
 
 
 
@@ -289,8 +399,7 @@ function combat(playerData, enemyData, attacker) {
 
     if (attacker === 'player') {
         return enemyDMG
-    }
-    else if (attacker === 'enemy') {
+    } else if (attacker === 'enemy') {
         return playerDMG
     }
 }
@@ -308,11 +417,9 @@ function enemyAtt(playerData, enemyData) {
 
     if (playerHP <= 0) {
         menuFrameContents.find('#hp').text("0");
-    }
-    else if (playerHP.toFixed(0) === '0') {
+    } else if (playerHP.toFixed(0) === '0') {
         menuFrameContents.find('#hp').text("1");
-    }
-    else {
+    } else {
         menuFrameContents.find('#hp').text(playerHP.toFixed(0));
     }
 }
@@ -321,8 +428,8 @@ function enemyAtt(playerData, enemyData) {
 function attackEnemy(playerData, enemyData) {
     // sound by LiamG_SFX https://freesound.org/people/LiamG_SFX/sounds/322150/
     let audio = new Audio('sounds/slash.wav');
-//     // sound by XxChr0nosxX https://freesound.org/people/XxChr0nosxX/sounds/268227/
-//     let audio = new Audio('sounds/swing.mp3');
+    //     // sound by XxChr0nosxX https://freesound.org/people/XxChr0nosxX/sounds/268227/
+    //     let audio = new Audio('sounds/swing.mp3');
     audio.play();
     let enemyDMG = combat(playerData, enemyData, 'player');
 
@@ -336,11 +443,9 @@ function attackEnemy(playerData, enemyData) {
         .css("width", enemyHPPerc + '%');
     if (enemyHPPerc <= 0) {
         mainFrameContents.find('#enemyHP').text('0');
-    }
-    else if (enemyHPPerc.toFixed(0) === '0') {
+    } else if (enemyHPPerc.toFixed(0) === '0') {
         mainFrameContents.find('#enemyHP').text('1');
-    }
-    else {
+    } else {
         mainFrameContents.find('#enemyHP').text(enemyHPPerc.toFixed(0));
     }
 }
@@ -356,47 +461,47 @@ function removeStatPlus() {
 }
 
 
-function addHP(playerData){
+function addHP(playerData) {
     // sound by goldendiaphragm https://freesound.org/people/goldendiaphragm/sounds/321288/
     let audio = new Audio('sounds/plus.wav');
     audio.play();
 
     playerData.playerHP += 5;
-    playerData.sp --;
+    playerData.sp--;
 
     menuFrameContents.find('#hp').text(playerData.playerHP.toFixed(0));
     menuFrameContents.find('#sp').text(playerData.sp);
 }
 
-function addAtt(playerData){
+function addAtt(playerData) {
     // sound by goldendiaphragm https://freesound.org/people/goldendiaphragm/sounds/321288/
     let audio = new Audio('sounds/plus.wav');
     audio.play();
-    playerData.playerAtt ++;
-    playerData.sp --;
+    playerData.playerAtt++;
+    playerData.sp--;
 
     menuFrameContents.find('#att').text(playerData.playerAtt);
     menuFrameContents.find('#sp').text(playerData.sp);
-    }
+}
 
-function addDef(playerData){
+function addDef(playerData) {
     // sound by goldendiaphragm https://freesound.org/people/goldendiaphragm/sounds/321288/
     let audio = new Audio('sounds/plus.wav');
     audio.play();
-    playerData.playerDef ++;
-    playerData.sp --;
+    playerData.playerDef++;
+    playerData.sp--;
 
     menuFrameContents.find('#def').text(playerData.playerDef);
     menuFrameContents.find('#sp').text(playerData.sp);
 }
 
 
-function purchase(playerData){
-    alert('test');
+function purchase(playerData) {
+    calculateItemValue(playerData)
     popupClose();
 }
 
-function popupClose(){
+function popupClose() {
     $("#popup").css("display", "none");
     $("#shopDiv").css("display", "none");
     $("#helpDiv").css("display", 'none');
@@ -421,20 +526,20 @@ function resize() {
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
 
-    let  height = windowHeight-10;
-    let  width = height *0.9;
+    let height = windowHeight - 10;
+    let width = height * 0.9;
 
-    if (width >= windowWidth-10) {
-        width = windowWidth-10;
+    if (width >= windowWidth - 10) {
+        width = windowWidth - 10;
         height = width / 0.9;
     }
 
     $("#mainFrame")
         .css('height', height + "px")
-        .css('width', width*.75 + 'px');
+        .css('width', width * .75 + 'px');
     $("#menuFrame")
         .css('height', height + "px")
-        .css('width', width *.25 + 'px');
+        .css('width', width * .25 + 'px');
 }
 
 // whenever player resize one's window, trigger resize() function

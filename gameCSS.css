@@ -38,9 +38,14 @@ form {
     width: auto;
 }
 
-#purchaseTable tr td {
+#purchaseTable th{
+    text-align: center;
+}
+
+#purchaseTable td {
     border: white solid 1px;
     text-align: center;
+    width: 25%;
 }
 
 #purchaseCell {
