@@ -8,6 +8,50 @@ var stage = 1;
 let gameOver = false;
 let pause = false;
 
+
+// pause/resume reference from https://stackoverflow.com/questions/24724852/pause-and-resume-setinterval
+function IntervalTimer(callback, interval) {
+    let timerId, startTime, remaining = 0;
+    let state = 0; //  0 = idle, 1 = running, 2 = paused, 3= resumed
+
+    this.pause = function () {
+        if (state !== 1) return;
+
+        pause = true;
+        remaining = interval - (new Date() - startTime);
+        window.clearInterval(timerId);
+        state = 2;
+
+    };
+
+    this.resume = function () {
+        if (state !== 2) return;
+
+        pause = false;
+        state = 3;
+        window.setTimeout(this.timeoutCallback, remaining);
+
+    };
+
+    this.timeoutCallback = function () {
+        if (state !== 3) return;
+
+        callback();
+
+        startTime = new Date();
+        timerId = window.setInterval(callback, interval);
+        state = 1;
+    };
+
+    // this.clearInterval = function () {
+    //     return;
+    // };
+
+    startTime = new Date();
+    timerId = window.setInterval(callback, interval);
+    state = 1;
+}
+
 //https://stackoverflow.com/questions/8093297/jquery-can-i-detect-once-all-content-is-loaded
 $(window).on('load', function() {
 
@@ -25,8 +69,6 @@ $(window).on('load', function() {
             endGame();
         }
     }, 0);
-
-
 
 
 });
@@ -105,7 +147,7 @@ function enemySetup() {
 
     // random alphanumeric string. https://stackoverflow.com/questions/10726909/random-alpha-numeric-string-in-javascript
     // needs better algorithm later on
-    let enemyName = Math.random().toString(36).substr(2, 7);
+    let enemyName = (Math.random().toString(36).substr(2, 7)).toUpperCase();
 
     // update stage number
     mainFrameContents.find('#stageNumber').text(stage);
@@ -144,8 +186,8 @@ function beginStage(playerData) {
     let gold = enemyData.enemyGold;
 
     // enemy attacks player
-    let enemyAttack = setInterval(function(){
-        if ( enemyData.enemyCurrentHP <= 0 || playerData.playerHP <= 0) {
+    let enemyAttack = new IntervalTimer(function () {
+        if (enemyData.enemyCurrentHP <= 0 || playerData.playerHP <= 0) {
             clearInterval(enemyAttack);
         }
         else {
@@ -154,7 +196,7 @@ function beginStage(playerData) {
     }, enemyAttackRate);
 
     // checks if player have defeated the enemy
-    let interval = setInterval(function() {
+    let interval = setInterval(function () {
         if (enemyData.enemyCurrentHP <= 0) {
             clearInterval(interval);
             endStage(playerData, gold);
@@ -163,17 +205,62 @@ function beginStage(playerData) {
 
     // attack button onclick
     // unbind() reference from https://stackoverflow.com/questions/14969960/jquery-click-events-firing-multiple-times
-    menuFrameContents.find("#attackButton").unbind().click(function(){
-        if (!gameOver) {
+    menuFrameContents.find("#attackButton").unbind().click(function () {
+        if (!gameOver && !pause) {
             attackEnemy(playerData, enemyData)
         }
+        else if (!gameOver && pause) {
+            alert('Game is paused.\nPress play to continue the game')
+        }
         else if (gameOver) {
-            alert("Game is over. Refresh the page to play again")
+            alert("Game is over.\nRefresh the page to play again")
         }
     });
 
+    //pause button pauses enemy attack and player attack (gives player time to shop/upgrade stats)
+    menuFrameContents.find("#pause").unbind().click(function () {
+        pauseOrPlay(enemyAttack)
+    });
+
+    menuFrameContents.find("#shop").unbind().click(function () {
+        pause = false;
+        pauseOrPlay(enemyAttack);
+        $("#popup").css("display", "block");
+        $("#shopDiv").css("display", "block");
+    });
+
+    menuFrameContents.find("#help").unbind().click(function() {
+        pause = false;
+        pauseOrPlay(enemyAttack);
+        $("#popup").css("display", "block");
+        $("#helpDiv").css("display", "block");
+    });
+
+
+    $("#purchaseButton").click(function(){
+        purchase(playerData);
+        pauseOrPlay(enemyAttack);
+    });
+
+    $(".closeIcon").click(function(){
+        popupClose();
+        pauseOrPlay(enemyAttack);
+    })
+
+
 }
 
+
+function pauseOrPlay(enemyAttack) {
+    if (!pause) {
+        enemyAttack.pause();
+        menuFrameContents.find('#pause').html("<img src=\"images/play.png\" class=\"icon\">PLAY");
+    }
+    else if (pause) {
+        enemyAttack.resume();
+        menuFrameContents.find('#pause').html("<img src=\"images/pause.png\" class=\"icon\">PAUSE");
+    }
+}
 
 // when the player defeats the enemy of the stage
 function endStage(playerData, gold) {
@@ -302,6 +389,20 @@ function addDef(playerData){
     menuFrameContents.find('#def').text(playerData.playerDef);
     menuFrameContents.find('#sp').text(playerData.sp);
 }
+
+
+function purchase(playerData){
+    alert('test');
+    popupClose();
+}
+
+function popupClose(){
+    $("#popup").css("display", "none");
+    $("#shopDiv").css("display", "none");
+    $("#helpDiv").css("display", 'none');
+}
+
+
 
 
 // when player hp goes equal to or below 0

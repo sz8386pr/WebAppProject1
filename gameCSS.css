@@ -1,7 +1,118 @@
+#popup {
+    width:100%;
+    height:100%;
+    opacity:.9;
+    top:0;
+    left:0;
+    display:none;
+    position:fixed;
+    background-color: #272926;
+    overflow:auto;
+    max-height: 905px;
+    max-width: 815px;
+}
+
+img.closeIcon {
+    position:absolute;
+    right:0;
+    top:0;
+    cursor:pointer;
+    height: 3vh;
+}
+
+
+form {
+    padding: 10px;
+    border:3px solid gray;
+    border-radius:10px;
+    position: absolute;
+    left: 10%;
+    top: 15%;
+    width: 80%;
+    height: auto;
+    background: #50626c;
+    color: white;
+}
+#purchaseTable{
+    max-width: 810px;
+    width: auto;
+}
+
+#purchaseTable tr td {
+    border: white solid 1px;
+    text-align: center;
+}
+
+#purchaseCell {
+    color: black;
+}
+
+
+#shopDiv {
+    display: none;
+}
+
+div#helpDiv {
+    display: none;
+}
+
+#helpMenu {
+    padding: 10px;
+    border:3px solid gray;
+    border-radius:10px;
+    position: absolute;
+    left: 10%;
+    top: 15%;
+    width: 80%;
+    height: auto;
+    background: #50626c;
+    color: white;
+    text-align: center;
+}
+
+
+
+
+
+
+.etc {
+    text-align: center;
+    font-size: 4vh;
+    vertical-align: middle;
+}
+
+#menuTable {
+    margin-top: 2vh;
+    width: 90%;
+}
+
+.menuCell {
+    width: 100%;
+    border-radius: 8px;
+    border: 2px solid black;
+    text-align: center;
+    font-size: 4vh;
+    vertical-align: middle;
+    background-color: #cccccc;
+}
+
+.icon {
+    height: 5vh;
+}
+
+
+
+
+
+
+
+
+
+
 body{margin:0; font-family: Verdana, Geneva, sans-serif; overflow: hidden}
 iframe{margin:0;width:100%; border-left:1px solid black; border-right:1px solid black;}
 p{margin:0}
-table{align-self: center; height: 26vh;}
+table{align-self: center; height: 26vh; margin: auto;}
 td{
     font-size: 2vh;
     font-weight: normal;
@@ -86,6 +197,8 @@ td{
 
 
 .attack {
+    margin-top: 5vh;
+    border-top: 2px solid black;
     border-bottom: 2px solid black;
     background-color: lightgrey;
     height: 25vh;
